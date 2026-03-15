@@ -10,7 +10,7 @@ import { decryptedStatText, enableEncryptionConfirmationMessages, onSavePassword
 import { MasterKeyEntity } from '@joplin/lib/services/e2ee/types';
 import { State } from '@joplin/lib/reducer';
 import { masterKeyEnabled, SyncInfo } from '@joplin/lib/services/synchronizer/syncInfoUtils';
-import { getDefaultMasterKey, setupAndDisableEncryption, toggleAndSetupEncryption } from '@joplin/lib/services/e2ee/utils';
+import { getDefaultMasterKey, masterPasswordIsValid, setupAndDisableEncryption, toggleAndSetupEncryption } from '@joplin/lib/services/e2ee/utils';
 import { useMemo, useState } from 'react';
 import { Divider, List } from 'react-native-paper';
 import shim from '@joplin/lib/shim';
@@ -154,6 +154,10 @@ const EncryptionConfigScreen = (props: Props) => {
 				const password2 = passwordPromptConfirmAnswer;
 				if (!password2) throw new Error(_('Confirm password cannot be empty'));
 				if (password !== password2) throw new Error(_('Passwords do not match!'));
+				if (hasMasterPassword) {
+					const isValid = await masterPasswordIsValid(password, masterKey);
+					if (!isValid) throw new Error(_('Invalid password. Please try again.'));
+				}
 				await toggleAndSetupEncryption(EncryptionService.instance(), true, masterKey, password);
 				// await generateMasterKeyAndEnableEncryption(EncryptionService.instance(), password);
 				setPasswordPromptShow(false);

@@ -112,11 +112,11 @@ export const useInputMasterPassword = (masterKeys: MasterKeyEntity[], activeMast
 	const [inputMasterPassword, setInputMasterPassword] = useState<string>('');
 
 	const onMasterPasswordSave = useCallback(async () => {
-		Setting.setValue('encryption.masterPassword', inputMasterPassword);
-
 		if (!(await masterPasswordIsValid(inputMasterPassword, masterKeys.find(mk => mk.id === activeMasterKeyId)))) {
 			alert('Password is invalid. Please try again.');
+			return;
 		}
+		Setting.setValue('encryption.masterPassword', inputMasterPassword);
 		// eslint-disable-next-line @seiyab/react-hooks/exhaustive-deps -- Old code before rule was applied
 	}, [inputMasterPassword]);
 
